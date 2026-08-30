@@ -1,71 +1,79 @@
 // app/page.tsx
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function HomePage() {
   const router = useRouter();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     // Check if user is already logged in (OTP verified)
     const isVerified = sessionStorage.getItem('otpVerified');
-    const username = sessionStorage.getItem('loginUsername');
+    const storedUsername = sessionStorage.getItem('loginUsername');
 
-    if (isVerified === 'true' && username) {
-      // If already verified, redirect to dashboard
+    if (isVerified === 'true' && storedUsername) {
       router.push('/dashboard');
     }
-    // Otherwise, stay on the login page (index.html)
   }, [router]);
 
-  // This component will render the content from public/index.html
-  // We use a useEffect to load the HTML content
-  useEffect(() => {
-    // If we're on the client side, fetch and inject the HTML
-    const loadLoginPage = async () => {
-      try {
-        const response = await fetch('/index.html');
-        const html = await response.text();
-        
-        // Create a container and inject the HTML
-        const container = document.getElementById('root');
-        if (container) {
-          container.innerHTML = html;
-          
-          // Re-initialize any scripts in the HTML
-          const scripts = container.querySelectorAll('script');
-          scripts.forEach((script) => {
-            const newScript = document.createElement('script');
-            newScript.textContent = script.textContent;
-            document.body.appendChild(newScript);
-          });
-        }
-      } catch (error) {
-        console.error('Error loading login page:', error);
-      }
-    };
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Add your login logic here (e.g., API call)
+    // For now, just log the inputs
+    console.log('Attempting login with:', { username, password });
 
-    // Only run on client side
-    if (typeof window !== 'undefined') {
-      // Check if we're already on the dashboard
-      const isVerified = sessionStorage.getItem('otpVerified');
-      const username = sessionStorage.getItem('loginUsername');
-      
-      if (!(isVerified === 'true' && username)) {
-        loadLoginPage();
-      }
-    }
-  }, []);
+    // Example: 
+    // if (username === 'test' && password === '1234') {
+    //   sessionStorage.setItem('otpVerified', 'true');
+    //   sessionStorage.setItem('loginUsername', username);
+    //   router.push('/dashboard');
+    // } else {
+    //   setError('Invalid credentials');
+    // }
+  };
 
   return (
-    <div id="root">
-      {/* This div will be populated with the HTML content */}
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-navy-700 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
+        <h1 className="text-2xl font-bold text-center text-navy-700">Login</h1>
+        
+        {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+
+        <form onSubmit={handleLogin} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Username</label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-navy-500 focus:border-navy-500"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-navy-500 focus:border-navy-500"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full py-2 px-4 bg-navy-700 text-white font-semibold rounded-md hover:bg-navy-800 transition-colors"
+          >
+            Login
+          </button>
+        </form>
       </div>
     </div>
   );
