@@ -3,7 +3,6 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Navy Federal Credit Union - Digital Banking",
-  description: "Training-mode banking interface",
 };
 
 export default function RootLayout({
