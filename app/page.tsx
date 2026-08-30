@@ -1,5 +1,17 @@
-import { redirect } from "next/navigation";
+// app/page.tsx
+'use client';
+
+import { useEffect } from 'react';
 
 export default function HomePage() {
-  redirect("/index.html");
+  useEffect(() => {
+    // Redirect to index.html
+    window.location.href = '/index.html';
+  }, []);
+
+  return (
+    <div style={{ textAlign: 'center', padding: '50px' }}>
+      <p>Redirecting to login...</p>
+    </div>
+  );
 }
