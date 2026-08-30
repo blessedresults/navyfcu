@@ -1,43 +1,19 @@
-// app/page.tsx
-'use client';
+import type { Metadata } from "next";
+import "./globals.css";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+export const metadata: Metadata = {
+  title: "Navy Federal Credit Union - Digital Banking",
+  description: "Training-mode banking interface",
+};
 
-export default function HomePage() {
-  const [htmlContent, setHtmlContent] = useState('');
-  const router = useRouter();
-
-  useEffect(() => {
-    // Check if user is already verified
-    const isVerified = sessionStorage.getItem('otpVerified');
-    const username = sessionStorage.getItem('loginUsername');
-
-    if (isVerified === 'true' && username) {
-      router.push('/dashboard');
-      return;
-    }
-
-    // Load the HTML content
-    const loadHTML = async () => {
-      try {
-        const response = await fetch('/index.html');
-        const html = await response.text();
-        setHtmlContent(html);
-      } catch (error) {
-        console.error('Error loading HTML:', error);
-        setHtmlContent('<div>Error loading page</div>');
-      }
-    };
-
-    loadHTML();
-  }, [router]);
-
-  // Use dangerouslySetInnerHTML to inject the HTML
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
-    <div 
-      dangerouslySetInnerHTML={{ __html: htmlContent }}
-      suppressHydrationWarning
-    />
+    <html lang="en">
+      <body>{children}</body>
+    </html>
   );
 }
